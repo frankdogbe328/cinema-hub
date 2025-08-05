@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #dc2626;
+            border-radius: 10px;
+        }
+        .btn {
+            background: #dc2626;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #991b1b;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1>🔧 Functionality Test Page</h1>
+        <button onclick="logout()" class="btn">🚪 Logout</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Search Function Test</h2>
+        <p>Testing if the search functions are properly defined:</p>
+        <button class="btn" onclick="testSearchFunctions()">Test Search Functions</button>
+        <div id="searchTestResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Logout Function Test</h2>
+        <p>Testing if the logout function is properly defined:</p>
+        <button class="btn" onclick="testLogoutFunction()">Test Logout Function</button>
+        <div id="logoutTestResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Navigation Test</h2>
+        <p>Testing navigation to main application:</p>
+        <a href="index.html" class="btn">Go to Main App</a>
+    </div>
+
+    <script>
+        function testSearchFunctions() {
+            const result = document.getElementById('searchTestResult');
+            let testResults = [];
+            
+            // Test if functions exist
+            if (typeof unifiedSearchWithTabs === 'function') {
+                testResults.push('✅ unifiedSearchWithTabs function exists');
+            } else {
+                testResults.push('❌ unifiedSearchWithTabs function missing');
+            }
+            
+            if (typeof showUnifiedResults === 'function') {
+                testResults.push('✅ showUnifiedResults function exists');
+            } else {
+                testResults.push('❌ showUnifiedResults function missing');
+            }
+            
+            if (typeof switchTab === 'function') {
+                testResults.push('✅ switchTab function exists');
+            } else {
+                testResults.push('❌ switchTab function missing');
+            }
+            
+            if (typeof showAlert === 'function') {
+                testResults.push('✅ showAlert function exists');
+            } else {
+                testResults.push('❌ showAlert function missing');
+            }
+            
+            result.innerHTML = testResults.join('<br>');
+        }
+        
+        function testLogoutFunction() {
+            const result = document.getElementById('logoutTestResult');
+            
+            if (typeof logout === 'function') {
+                result.innerHTML = '✅ logout function exists<br>Click the logout button above to test it';
+            } else {
+                result.innerHTML = '❌ logout function missing';
+            }
+        }
+
+        // Logout function
+        function logout() {
+            console.log('Logging out...');
+            
+            // Clear ALL authentication data
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('validCredentials');
+            localStorage.removeItem('tempSignUp');
+            localStorage.removeItem('resetEmail');
+            
+            // Clear any session data
+            sessionStorage.clear();
+            
+            console.log('All data cleared, redirecting to login...');
+            
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+        
+        // Load functions from index.html for testing
+        window.addEventListener('load', function() {
+            // Try to load the main app's JavaScript
+            const script = document.createElement('script');
+            script.src = 'index.html';
+            script.onerror = function() {
+                console.log('Could not load functions from index.html');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html> 

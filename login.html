@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaHub - Login</title>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 30%, #2d0000 70%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bg-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .film-strip {
+            position: absolute;
+            width: 100px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 20px,
+                rgba(255, 255, 255, 0.02) 20px,
+                rgba(255, 255, 255, 0.02) 40px
+            );
+            animation: filmRoll 20s linear infinite;
+        }
+
+        .film-strip:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .film-strip:nth-child(2) { right: 15%; animation-delay: -7s; }
+        .film-strip:nth-child(3) { left: 70%; animation-delay: -14s; }
+
+        @keyframes filmRoll {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .spotlight {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(220, 20, 60, 0.15) 0%, transparent 70%);
+            animation: spotlight 15s ease-in-out infinite;
+        }
+
+        .spotlight:nth-child(4) { top: 10%; left: 20%; animation-delay: 0s; }
+        .spotlight:nth-child(5) { bottom: 20%; right: 25%; animation-delay: -5s; }
+
+        @keyframes spotlight {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .login-container, .modal-container {
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            max-width: 90vw;
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(220, 20, 60, 0.2), 0 0 100px rgba(0, 0, 0, 0.8);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .modal-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .modal-container.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            background: linear-gradient(45deg, #dc143c, #ff1744, #b71c1c, #d32f2f);
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease infinite;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .tagline {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #dc143c;
+            background: rgba(40, 40, 40, 0.9);
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-btn, .modal-btn, .otp-btn, .reset-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #dc143c, #ff1744);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before, .modal-btn::before, .otp-btn::before, .reset-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before, .modal-btn:hover::before, .otp-btn:hover::before, .reset-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover, .modal-btn:hover, .otp-btn:hover, .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(220, 20, 60, 0.5);
+            background: linear-gradient(45deg, #b71c1c, #dc143c);
+        }
+
+        .login-btn:active, .modal-btn:active, .otp-btn:active, .reset-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .forgot-password, .signup-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a, .signup-link a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover, .signup-link a:hover {
+            color: #dc143c;
+            text-shadow: 0 0 10px rgba(220, 20, 60, 0.5);
+        }
+
+        .signup-link {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .signup-link p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .signup-link a {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        /* Google Sign-In Styles */
+        .google-signin-section {
+            margin: 20px 0;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            padding: 0 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: #ffffff;
+            color: #333333;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-signin-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .google-signin-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #dc143c;
+        }
+
+        @media (max-width: 480px) {
+            .login-container, .modal-container {
+                padding: 30px 25px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="film-strip"></div>
+        <div class="film-strip"></div>
+        <div class="film-strip"></div>
+        <div class="spotlight"></div>
+        <div class="spotlight"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="logo-section">
+            <h1 class="logo">CINEMAHUB</h1>
+            <p class="tagline">Your Movie Universe</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="admin@cinemahub.com" value="admin@cinemahub.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="admin123" value="admin123" required>
+            </div>
+
+            <button type="submit" class="login-btn">Sign In</button>
+        </form>
+
+        <!-- Google Sign-In Button -->
+        <div class="google-signin-section">
+            <div class="divider">
+                <span>or</span>
+            </div>
+            <button type="button" class="google-signin-btn" id="googleSignInBtn" onclick="signInWithGoogle()">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="google-icon">
+                <span id="googleBtnText">Sign in with Google</span>
+            </button>
+        </div>
+
+        <div class="forgot-password">
+            <a href="#" onclick="showForgotPasswordModal()">Forgot your password?</a>
+        </div>
+
+        <div class="signup-link">
+            <p>Don't have an account? <a href="#" onclick="showSignUpModal()">Sign up</a></p>
+        </div>
+    </div>
+
+    <!-- Sign-Up Modal -->
+    <div class="modal-container" id="signUpModal">
+        <span class="modal-close" onclick="closeModals()">✕</span>
+        <div class="logo-section">
+            <h1 class="logo">CINEMAHUB</h1>
+            <p class="tagline">Create Your Account</p>
+        </div>
+
+        <form id="signUpForm">
+            <div class="form-group">
+                <label for="signUpEmail">Email Address</label>
+                <input type="email" id="signUpEmail" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="signUpUsername">Username</label>
+                <input type="text" id="signUpUsername" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="signUpPassword">Password</label>
+                <input type="password" id="signUpPassword" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="modal-btn">Sign Up</button>
+        </form>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div class="modal-container" id="otpModal">
+        <span class="modal-close" onclick="closeModals()">✕</span>
+        <div class="logo-section">
+            <h1 class="logo">CINEMAHUB</h1>
+            <p class="tagline">Verify Your Email</p>
+        </div>
+
+        <form id="otpForm">
+            <div class="form-group">
+                <label for="otpCode">Enter OTP</label>
+                <input type="text" id="otpCode" name="otp" placeholder="Enter 6-digit OTP" required>
+            </div>
+            <button type="submit" class="otp-btn">Verify OTP</button>
+        </form>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-container" id="forgotPasswordModal">
+        <span class="modal-close" onclick="closeModals()">✕</span>
+        <div class="logo-section">
+            <h1 class="logo">CINEMAHUB</h1>
+            <p class="tagline">Reset Your Password</p>
+        </div>
+
+        <form id="forgotPasswordForm">
+            <div class="form-group">
+                <label for="forgotEmail">Email Address</label>
+                <input type="email" id="forgotEmail" name="email" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="reset-btn">Send Reset Link</button>
+        </form>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-container" id="resetPasswordModal">
+        <span class="modal-close" onclick="closeModals()">✕</span>
+        <div class="logo-section">
+            <h1 class="logo">CINEMAHUB</h1>
+            <p class="tagline">Set New Password</p>
+        </div>
+
+        <form id="resetPasswordForm">
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="password" placeholder="Enter new password" required>
+            </div>
+            <button type="submit" class="reset-btn">Reset Password</button>
+        </form>
+    </div>
+
+    <script>
+        // Initialize credentials in localStorage if not already set
+        let validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || [
+            { email: 'admin@cinemahub.com', password: 'admin123' },
+            { email: 'demo@cinemahub.com', password: 'demo123' },
+            { email: 'user@cinemahub.com', password: 'user123' }
+        ];
+
+        // Backend API base URL - hardcoded to ensure it works
+        const API_BASE_URL = window.location.origin || 'http://localhost:3000';
+        
+        // Test server connection
+        async function testServerConnection() {
+            try {
+                console.log('🔍 Testing server connection...');
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const data = await response.json();
+                console.log('✅ Server is running:', data);
+                return true;
+            } catch (error) {
+                console.log('❌ Server connection failed:', error.message);
+                return false;
+            }
+        }
+
+        // Enhanced login function with better error handling
+        async function simpleLogin(email, password) {
+            try {
+                console.log('Attempting login with:', { email, password });
+                console.log('API URL:', `${API_BASE_URL}/api/auth/login`);
+                
+                // First, try to connect to the server
+                const healthCheck = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'OPTIONS',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }).catch(() => null);
+                
+                if (!healthCheck) {
+                    console.log('Server not responding, using fallback authentication');
+                    return await fallbackLogin(email, password);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                return { success: response.ok, data };
+            } catch (error) {
+                console.error('Login error:', error);
+                console.log('Falling back to local authentication');
+                return await fallbackLogin(email, password);
+            }
+        }
+
+        // Fallback authentication for when server is not available
+        async function fallbackLogin(email, password) {
+            console.log('Using fallback authentication');
+            
+            // Check against valid credentials
+            const validUser = validCredentials.find(cred => 
+                cred.email === email && cred.password === password
+            );
+            
+            if (validUser) {
+                // Create a mock token
+                const mockToken = btoa(JSON.stringify({
+                    userId: Date.now(),
+                    email: email,
+                    exp: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
+                }));
+                
+                return {
+                    success: true,
+                    data: {
+                        success: true,
+                        message: 'Login successful (offline mode)',
+                        data: {
+                            token: mockToken,
+                            user: {
+                                id: Date.now(),
+                                email: email,
+                                username: email.split('@')[0]
+                            }
+                        }
+                    }
+                };
+            } else {
+                return {
+                    success: false,
+                    data: {
+                        success: false,
+                        message: 'Invalid credentials'
+                    }
+                };
+            }
+        }
+
+        // Login Form Submission - Simplified and bulletproof
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Signing In...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Test server connection first
+                const serverConnected = await testServerConnection();
+                if (!serverConnected) {
+                    console.log('⚠️ Server not available, using fallback authentication');
+                    showAlert('⚠️ Server not available. Using offline mode.', 'warning');
+                }
+                
+                const result = await simpleLogin(email, password);
+                
+                if (result.success && result.data.success) {
+                    // Store JWT token
+                    localStorage.setItem('token', result.data.data.token);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', email);
+                    
+                    const mode = serverConnected ? 'online' : 'offline';
+                    showAlert(`✅ Login successful! Welcome to CinemaHub! (${mode} mode)`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    const errorMessage = result.data?.message || result.error || 'Login failed';
+                    showAlert(`❌ ${errorMessage}`, 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert(`❌ Network error: ${error.message}. Please try again.`, 'error');
+            } finally {
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Sign-Up Form Submission
+        document.getElementById('signUpForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('signUpEmail').value;
+            const username = document.getElementById('signUpUsername').value;
+            const password = document.getElementById('signUpPassword').value;
+
+            // Basic validation
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showAlert('❌ Invalid email format', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('❌ Password must be at least 6 characters', 'error');
+                return;
+            }
+            if (username.length < 3) {
+                showAlert('❌ Username must be at least 3 characters', 'error');
+                return;
+            }
+            if (validCredentials.some(cred => cred.email === email)) {
+                showAlert('❌ Email already registered', 'error');
+                return;
+            }
+
+            // Store credentials temporarily
+            localStorage.setItem('tempSignUp', JSON.stringify({ email, username, password }));
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        password, 
+                        name: username 
+                    })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('✅ Registration successful! Please check your email for OTP verification.', 'success');
+                    closeModals();
+                    document.getElementById('otpModal').classList.add('active');
+                } else {
+                    showAlert(`❌ ${data.message || 'Registration failed'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('❌ Network error. Please try again.', 'error');
+            }
+        });
+
+        // OTP Verification
+        document.getElementById('otpForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const otp = document.getElementById('otpCode').value;
+            const tempSignUp = JSON.parse(localStorage.getItem('tempSignUp'));
+            
+                         try {
+                 const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ email: tempSignUp.email, otp })
+                 });
+                 const data = await response.json();
+
+                 if (response.ok) {
+                     validCredentials.push({ email: tempSignUp.email, password: tempSignUp.password });
+                     localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+                     localStorage.removeItem('tempSignUp');
+                     showAlert('✅ Sign-up successful! You can now log in.', 'success');
+                     closeModals();
+                 } else {
+                     showAlert(`❌ ${data.message || 'OTP verification failed'}`, 'error');
+                 }
+             } catch (error) {
+                 console.error('OTP verification error:', error);
+                 showAlert('❌ Network error. Please try again.', 'error');
+             }
+        });
+
+                 // Forgot Password Form Submission
+         document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+             e.preventDefault();
+             
+             const email = document.getElementById('forgotEmail').value;
+             
+             try {
+                 const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ email })
+                 });
+                 const data = await response.json();
+
+                 if (response.ok) {
+                     localStorage.setItem('resetEmail', email);
+                     showAlert('✅ Password reset link sent! Please check your email.', 'success');
+                     closeModals();
+                     document.getElementById('resetPasswordModal').classList.add('active');
+                 } else {
+                     showAlert(`❌ ${data.message || 'Email not found'}`, 'error');
+                 }
+             } catch (error) {
+                 console.error('Forgot password error:', error);
+                 showAlert('❌ Network error. Please try again.', 'error');
+             }
+         });
+
+        // Reset Password Form Submission (unchanged, simulated)
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const resetEmail = localStorage.getItem('resetEmail');
+            
+            if (newPassword.length < 6) {
+                showAlert('❌ Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            validCredentials = validCredentials.map(cred => 
+                cred.email === resetEmail ? { ...cred, password: newPassword } : cred
+            );
+            localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+            localStorage.removeItem('resetEmail');
+            showAlert('✅ Password reset successful! You can now log in.', 'success');
+            closeModals();
+        });
+
+        // Modal Controls
+        function showSignUpModal() {
+            closeModals();
+            document.getElementById('signUpModal').classList.add('active');
+        }
+
+        function showForgotPasswordModal() {
+            closeModals();
+            document.getElementById('forgotPasswordModal').classList.add('active');
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-container').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+
+        // Custom Alert
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            const backgroundColor = type === 'success' ? 'rgba(40, 167, 69, 0.9)' : 
+                                  type === 'error' ? 'rgba(220, 20, 60, 0.9)' : 
+                                  type === 'warning' ? 'rgba(255, 193, 7, 0.9)' : // Added warning color
+                                  'rgba(220, 20, 60, 0.9)';
+            
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${backgroundColor};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                animation: slideIn 0.3s ease-out;
+                font-weight: 500;
+            `;
+            
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 4000);
+        }
+
+        // Input animations
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Logout function - Fixed once and for all
+        function logout() {
+            console.log('Logging out...');
+            
+            // Clear ALL authentication data
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('validCredentials');
+            localStorage.removeItem('tempSignUp');
+            localStorage.removeItem('resetEmail');
+            
+            // Clear any session data
+            sessionStorage.clear();
+            
+            console.log('All data cleared, redirecting to login...');
+            
+            // Show success message
+            showAlert('✅ Logged out successfully!', 'success');
+            
+            // Redirect to login page after a short delay
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        }
+
+        // Google Sign-In Function - Fixed and simplified
+        function signInWithGoogle() {
+            console.log('Google Sign-In clicked!');
+            
+            // Show loading state
+            const btn = document.getElementById('googleSignInBtn');
+            const btnText = document.getElementById('googleBtnText');
+            btn.disabled = true;
+            btnText.textContent = 'Signing in...';
+            
+            // Check if Google Identity Services is available
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                console.log('Google Identity Services available, initializing...');
+                
+                try {
+                    // Use Google Identity Services
+                    google.accounts.id.initialize({
+                        client_id: '220075965151-i4j9mave9vnu7lae12ehe5qcijvshpf3.apps.googleusercontent.com',
+                        callback: handleGoogleCredentialResponse,
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+                    
+                    console.log('Google Identity Services initialized, prompting...');
+                    google.accounts.id.prompt((notification) => {
+                        console.log('Google prompt notification:', notification);
+                        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                            console.log('Google Sign-In not displayed, using fallback');
+                            useMockGoogleSignIn();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error initializing Google Identity Services:', error);
+                    useMockGoogleSignIn();
+                }
+            } else {
+                console.log('Google Identity Services not available, using fallback');
+                useMockGoogleSignIn();
+            }
+        }
+
+        // Fallback mock Google sign-in
+        function useMockGoogleSignIn() {
+            console.log('Using mock Google sign-in...');
+            
+            const mockGoogleUser = {
+                email: 'user@gmail.com',
+                name: 'Google User',
+                picture: 'https://via.placeholder.com/150',
+                googleId: 'google_' + Date.now()
+            };
+
+            // Send to our backend with proper error handling
+            fetch(`${API_BASE_URL}/api/auth/google`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(mockGoogleUser)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Google auth response:', data);
+                if (data.success) {
+                    // Store authentication data
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('userEmail', data.data.user.email);
+                    localStorage.setItem('userData', JSON.stringify(data.data.user));
+                    
+                    showAlert('✅ Google sign-in successful!', 'success');
+                    
+                    // Redirect to main page
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showAlert('❌ Google sign-in failed: ' + data.message, 'error');
+                    resetGoogleButton();
+                }
+            })
+            .catch(error => {
+                console.error('Google sign-in error:', error);
+                showAlert('❌ Google sign-in failed: ' + error.message, 'error');
+                resetGoogleButton();
+            });
+        }
+
+        // Reset Google button state
+        function resetGoogleButton() {
+            const btn = document.getElementById('googleSignInBtn');
+            const btnText = document.getElementById('googleBtnText');
+            btn.disabled = false;
+            btnText.textContent = 'Sign in with Google';
+        }
+
+        // Handle Google credential response
+        function handleGoogleCredentialResponse(response) {
+            console.log('Google credential response received:', response);
+            
+            try {
+                // Decode the JWT token from Google
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                
+                const googleUser = {
+                    email: payload.email,
+                    name: payload.name,
+                    picture: payload.picture,
+                    googleId: payload.sub
+                };
+
+                console.log('Google user data:', googleUser);
+
+                // Send to our backend with proper error handling
+                fetch(`${API_BASE_URL}/api/auth/google`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(googleUser)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Google auth response:', data);
+                    if (data.success) {
+                        // Store authentication data
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('token', data.data.token);
+                        localStorage.setItem('userEmail', data.data.user.email);
+                        localStorage.setItem('userData', JSON.stringify(data.data.user));
+                        
+                        showAlert('✅ Google sign-in successful!', 'success');
+                        
+                        // Redirect to main page
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1500);
+                    } else {
+                        showAlert('❌ Google sign-in failed: ' + data.message, 'error');
+                        resetGoogleButton();
+                    }
+                })
+                .catch(error => {
+                    console.error('Google sign-in error:', error);
+                    showAlert('❌ Google sign-in failed: ' + error.message, 'error');
+                    resetGoogleButton();
+                });
+            } catch (error) {
+                console.error('Error processing Google credential:', error);
+                showAlert('❌ Error processing Google sign-in. Please try again.', 'error');
+                resetGoogleButton();
+            }
+        }
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                // User is logged in, redirect to main page
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

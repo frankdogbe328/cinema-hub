@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaHub - Movie Details</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: rgba(220,38,38,0.07);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(220,38,38,0.15);
+            padding: 2rem 2.5rem 2.5rem 2.5rem;
+        }
+        .back-link {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+        .movie-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .movie-meta {
+            color: #a3a3a3;
+            margin-bottom: 1.5rem;
+        }
+        .movie-description {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .movie-cast {
+            margin-bottom: 2rem;
+        }
+        .movie-cast span {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .trailer-container {
+            margin-bottom: 2rem;
+        }
+        .trailer-container iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+            border-radius: 15px;
+        }
+        .reviews-section {
+            margin-top: 2.5rem;
+        }
+        .reviews-section h3 {
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+        .review {
+            background: rgba(220,38,38,0.12);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .review .reviewer {
+            font-weight: 700;
+            color: #fff;
+        }
+        .review .review-rating {
+            color: #ffd700;
+            margin-left: 0.5rem;
+        }
+        .review .review-comment {
+            margin-top: 0.5rem;
+            color: #e5e5e5;
+        }
+        .review-form {
+            margin-top: 2rem;
+            background: rgba(220,38,38,0.09);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .review-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .review-form input, .review-form textarea, .review-form select {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #dc2626;
+            background: #222;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .review-form button {
+            background: linear-gradient(90deg, #dc2626, #991b1b);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .review-form button:hover {
+            background: linear-gradient(90deg, #991b1b, #dc2626);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <a href="index.html" class="back-link">&larr; Back to CinemaHub</a>
+            <button onclick="logout()" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">🚪 Logout</button>
+        </div>
+        <h1 class="movie-title" id="movieTitle">Movie Title</h1>
+        <div class="movie-meta" id="movieMeta">2025 &bull; Genre &bull; 8.2/10</div>
+        <div class="movie-description" id="movieDescription">Movie description goes here.</div>
+        <div class="movie-cast" id="movieCast"><span>Cast:</span> Actor 1, Actor 2, Actor 3</div>
+        <div class="trailer-container" id="trailerContainer">
+            <iframe id="movieTrailer" src="" allowfullscreen></iframe>
+        </div>
+        <div class="reviews-section">
+            <h3>User Reviews</h3>
+            <div id="reviewsList">
+                <!-- Reviews will appear here -->
+            </div>
+            <form class="review-form" id="reviewForm">
+                <label for="reviewer">Your Name</label>
+                <input type="text" id="reviewer" required>
+                <label for="reviewRating">Rating</label>
+                <select id="reviewRating" required>
+                    <option value="">Select</option>
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option>
+                    <option value="1">1 - Terrible</option>
+                </select>
+                <label for="reviewComment">Comment</label>
+                <textarea id="reviewComment" rows="3" required></textarea>
+                <button type="submit">Submit Review</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Placeholder movie data (replace with dynamic data as needed)
+        const movie = {
+            title: "How to Train Your Dragon (Live-action)",
+            year: 2025,
+            genre: "Fantasy",
+            rating: 8.2,
+            description: "A new live-action retelling of the beloved dragon saga.",
+            cast: ["Jay Baruchel", "America Ferrera", "Gerard Butler"],
+            trailer: "OWEq2Pf8qpk"
+        };
+        // Placeholder reviews
+        let reviews = [
+            { name: "Alice", rating: 5, comment: "Absolutely loved it!" },
+            { name: "Bob", rating: 4, comment: "Great effects and story." }
+        ];
+        // Populate movie details
+        document.getElementById('movieTitle').textContent = movie.title;
+        document.getElementById('movieMeta').textContent = `${movie.year} • ${movie.genre} • ${movie.rating}/10`;
+        document.getElementById('movieDescription').textContent = movie.description;
+        document.getElementById('movieCast').innerHTML = `<span>Cast:</span> ${movie.cast.join(', ')}`;
+        document.getElementById('movieTrailer').src = `https://www.youtube.com/embed/${movie.trailer}?autoplay=0&controls=1&modestbranding=1&rel=0`;
+        // Render reviews
+        function renderReviews() {
+            const reviewsList = document.getElementById('reviewsList');
+            reviewsList.innerHTML = '';
+            if (reviews.length === 0) {
+                reviewsList.innerHTML = '<p style="color:#a3a3a3;">No reviews yet. Be the first to review!</p>';
+                return;
+            }
+            reviews.forEach(r => {
+                reviewsList.innerHTML += `
+                    <div class="review">
+                        <span class="reviewer">${r.name}</span>
+                        <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                        <div class="review-comment">${r.comment}</div>
+                    </div>
+                `;
+            });
+        }
+        renderReviews();
+        // Handle review form
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('reviewer').value.trim();
+            const rating = parseInt(document.getElementById('reviewRating').value);
+            const comment = document.getElementById('reviewComment').value.trim();
+            if (!name || !rating || !comment) return;
+            reviews.unshift({ name, rating, comment });
+            renderReviews();
+            this.reset();
+        });
+
+        // Logout function
+        function logout() {
+            console.log('Logging out...');
+            
+            // Clear ALL authentication data
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('validCredentials');
+            localStorage.removeItem('tempSignUp');
+            localStorage.removeItem('resetEmail');
+            
+            // Clear any session data
+            sessionStorage.clear();
+            
+            console.log('All data cleared, redirecting to login...');
+            
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html> 
