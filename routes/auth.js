@@ -184,9 +184,29 @@ router.post('/verify-otp', [
     delete user.otp;
     delete user.otpExpiry;
 
+    // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key-for-development';
+    const token = jwt.sign(
+      { 
+        userId: user.id, 
+        email: user.email,
+        username: user.username 
+      },
+      jwtSecret,
+      { expiresIn: '7d' }
+    );
+
     res.json({
       success: true,
-      message: 'Email verified successfully'
+      message: 'Email verified successfully',
+      data: {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username
+        }
+      }
     });
 
   } catch (error) {
@@ -194,6 +214,81 @@ router.post('/verify-otp', [
     res.status(500).json({
       success: false,
       message: 'OTP verification failed',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @route   POST /api/auth/resend-otp
+ * @desc    Resend OTP to user's email
+ * @access  Public
+ */
+router.post('/resend-otp', [
+  body('email').isEmail().withMessage('Please enter a valid email')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: errors.array()
+      });
+    }
+
+    const { email } = req.body;
+
+    const user = users.find(u => u.email === email);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    user.otp = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Try to send email, but fallback to console log if email fails
+    if (transporter) {
+      try {
+        const mailOptions = {
+          from: process.env.EMAIL_FROM || 'CinemaHub <noreply@cinemahub.com>',
+          to: email,
+          subject: 'CinemaHub - New Verification Code',
+          html: `
+            <h2>New Verification Code</h2>
+            <p>Your new verification code is: <strong>${otp}</strong></p>
+            <p>This code will expire in 10 minutes.</p>
+            <p>If you didn't request this code, please ignore this email.</p>
+          `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ New verification email sent to ${email}`);
+      } catch (emailError) {
+        console.log(`⚠️ Email sending failed for ${email}: ${emailError.message}`);
+        console.log(`📧 Development OTP for ${email}: ${otp}`);
+        console.log('💡 To enable email sending, update your .env file with valid email credentials');
+      }
+    } else {
+      console.log(`📧 Development OTP for ${email}: ${otp}`);
+      console.log('💡 To enable email sending, configure EMAIL_USER and EMAIL_PASS in your .env file');
+    }
+
+    res.json({
+      success: true,
+      message: 'New OTP sent successfully'
+    });
+
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to resend OTP',
       error: error.message
     });
   }

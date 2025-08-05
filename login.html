@@ -542,25 +542,29 @@
         </form>
     </div>
 
-         <!-- OTP Verification Modal -->
-     <div class="modal-container" id="otpModal">
-         <span class="modal-close" onclick="closeModals()">✕</span>
-         <div class="logo-section">
-             <h1 class="logo">CINEMAHUB</h1>
-             <p class="tagline">Verify Your Account</p>
-         </div>
+                   <!-- OTP Verification Modal -->
+      <div class="modal-container" id="otpModal">
+          <span class="modal-close" onclick="closeModals()">✕</span>
+          <div class="logo-section">
+              <h1 class="logo">CINEMAHUB</h1>
+              <p class="tagline">Verify Your Account</p>
+          </div>
 
-         <form id="otpForm">
-             <div class="form-group">
-                 <label for="otpCode">Enter OTP</label>
-                 <input type="text" id="otpCode" name="otp" placeholder="Enter 6-digit OTP" required>
-                 <small style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 0.5rem; display: block;">
-                     💡 The OTP was shown in the previous message. In a production app, this would be sent via email.
-                 </small>
-             </div>
-             <button type="submit" class="otp-btn">Verify OTP</button>
-         </form>
-     </div>
+          <form id="otpForm">
+              <div class="form-group">
+                  <label for="otpCode">Enter OTP</label>
+                  <input type="text" id="otpCode" name="otp" placeholder="Enter 6-digit OTP" required>
+                  <small style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 0.5rem; display: block;">
+                      💡 Check your email for the OTP. If you don't receive it, click "Resend OTP" below.
+                  </small>
+              </div>
+              <button type="submit" class="otp-btn">Verify OTP</button>
+              <button type="button" class="reset-btn" id="resendOtpBtn" onclick="resendOTP()" style="margin-top: 10px;">
+                  <span id="resendText">Resend OTP</span>
+                  <span id="resendTimer" style="display: none;">Resend in <span id="countdown">60</span>s</span>
+              </button>
+          </form>
+      </div>
 
     <!-- Forgot Password Modal -->
     <div class="modal-container" id="forgotPasswordModal">
@@ -753,175 +757,216 @@
             }
         });
 
-        // Sign-Up Form Submission - Enhanced for hosted environment
-        document.getElementById('signUpForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('signUpEmail').value;
-            const username = document.getElementById('signUpUsername').value;
-            const password = document.getElementById('signUpPassword').value;
+                 // Sign-Up Form Submission - Enhanced for hosted environment
+         document.getElementById('signUpForm').addEventListener('submit', async function(e) {
+             e.preventDefault();
+             
+             const email = document.getElementById('signUpEmail').value;
+             const username = document.getElementById('signUpUsername').value;
+             const password = document.getElementById('signUpPassword').value;
 
-            // Basic validation
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showAlert('❌ Invalid email format', 'error');
-                return;
-            }
-            if (password.length < 6) {
-                showAlert('❌ Password must be at least 6 characters', 'error');
-                return;
-            }
-            if (username.length < 3) {
-                showAlert('❌ Username must be at least 3 characters', 'error');
-                return;
-            }
-            if (validCredentials.some(cred => cred.email === email)) {
-                showAlert('❌ Email already registered', 'error');
-                return;
-            }
+             // Basic validation
+             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                 showAlert('❌ Invalid email format', 'error');
+                 return;
+             }
+             if (password.length < 6) {
+                 showAlert('❌ Password must be at least 6 characters', 'error');
+                 return;
+             }
+             if (username.length < 3) {
+                 showAlert('❌ Username must be at least 3 characters', 'error');
+                 return;
+             }
+             if (validCredentials.some(cred => cred.email === email)) {
+                 showAlert('❌ Email already registered', 'error');
+                 return;
+             }
 
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Creating Account...';
-            submitBtn.disabled = true;
+             // Show loading state
+             const submitBtn = this.querySelector('button[type="submit"]');
+             const originalText = submitBtn.textContent;
+             submitBtn.textContent = 'Creating Account...';
+             submitBtn.disabled = true;
 
-            try {
-                // First, test server connection
-                const serverConnected = await testServerConnection();
-                
-                if (serverConnected) {
-                    // Try backend registration
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                email, 
-                                password, 
-                                name: username 
-                            })
-                        });
-                        const data = await response.json();
+             try {
+                 // First, test server connection
+                 const serverConnected = await testServerConnection();
+                 
+                 if (serverConnected) {
+                     // Try backend registration
+                     try {
+                         const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify({ 
+                                 email, 
+                                 password, 
+                                 name: username 
+                             })
+                         });
+                         const data = await response.json();
 
-                        if (response.ok) {
-                            showAlert('✅ Registration successful! Please check your email for OTP verification.', 'success');
-                            closeModals();
-                            document.getElementById('otpModal').classList.add('active');
-                            return;
-                        } else {
-                            throw new Error(data.message || 'Registration failed');
-                        }
-                    } catch (backendError) {
-                        console.log('Backend registration failed, using client-side registration:', backendError.message);
-                        // Fall through to client-side registration
-                    }
-                }
+                         if (response.ok) {
+                             showAlert('✅ Registration successful! Please check your email for OTP verification.', 'success');
+                             closeModals();
+                             document.getElementById('otpModal').classList.add('active');
+                             startResendTimer(); // Start the resend timer
+                             return;
+                         } else {
+                             throw new Error(data.message || 'Registration failed');
+                         }
+                     } catch (backendError) {
+                         console.log('Backend registration failed, using client-side registration:', backendError.message);
+                         // Fall through to client-side registration
+                     }
+                 }
 
-                // Client-side registration (works without backend)
-                console.log('Using client-side registration');
-                
-                // Store credentials temporarily
-                localStorage.setItem('tempSignUp', JSON.stringify({ email, username, password }));
-                
-                // Generate a simple OTP (6 digits)
-                const otp = Math.floor(100000 + Math.random() * 900000).toString();
-                localStorage.setItem('tempOTP', otp);
-                
-                // Show OTP to user (in real app, this would be sent via email)
-                showAlert(`✅ Account created! Your OTP is: ${otp}`, 'success');
-                closeModals();
-                document.getElementById('otpModal').classList.add('active');
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                showAlert('❌ Registration failed. Please try again.', 'error');
-            } finally {
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        });
+                 // Client-side registration (works without backend)
+                 console.log('Using client-side registration');
+                 
+                 // Store credentials temporarily
+                 localStorage.setItem('tempSignUp', JSON.stringify({ email, username, password }));
+                 
+                 // Generate a simple OTP (6 digits)
+                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                 localStorage.setItem('tempOTP', otp);
+                 
+                 // Show OTP to user (in real app, this would be sent via email)
+                 showAlert(`✅ Account created! Your OTP is: ${otp}`, 'success');
+                 closeModals();
+                 document.getElementById('otpModal').classList.add('active');
+                 startResendTimer(); // Start the resend timer
+                 
+             } catch (error) {
+                 console.error('Registration error:', error);
+                 showAlert('❌ Registration failed. Please try again.', 'error');
+             } finally {
+                 // Reset button state
+                 submitBtn.textContent = originalText;
+                 submitBtn.disabled = false;
+             }
+         });
 
-        // OTP Verification - Enhanced for hosted environment
-        document.getElementById('otpForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const otp = document.getElementById('otpCode').value;
-            const tempSignUp = JSON.parse(localStorage.getItem('tempSignUp'));
-            const storedOTP = localStorage.getItem('tempOTP');
-            
-            if (!tempSignUp) {
-                showAlert('❌ No pending registration found. Please sign up again.', 'error');
-                return;
-            }
+                 // OTP Verification - Enhanced for hosted environment
+         document.getElementById('otpForm').addEventListener('submit', async function(e) {
+             e.preventDefault();
+             
+             const otp = document.getElementById('otpCode').value;
+             const tempSignUp = JSON.parse(localStorage.getItem('tempSignUp'));
+             const storedOTP = localStorage.getItem('tempOTP');
+             
+             if (!tempSignUp) {
+                 showAlert('❌ No pending registration found. Please sign up again.', 'error');
+                 return;
+             }
 
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Verifying...';
-            submitBtn.disabled = true;
+             // Show loading state
+             const submitBtn = this.querySelector('button[type="submit"]');
+             const originalText = submitBtn.textContent;
+             submitBtn.textContent = 'Verifying...';
+             submitBtn.disabled = true;
 
-            try {
-                // First, try backend verification
-                const serverConnected = await testServerConnection();
-                
-                if (serverConnected) {
-                    try {
-                        const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: tempSignUp.email, otp })
-                        });
-                        const data = await response.json();
+             try {
+                 // First, try backend verification
+                 const serverConnected = await testServerConnection();
+                 
+                 if (serverConnected) {
+                     try {
+                         const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify({ email: tempSignUp.email, otp })
+                         });
+                         const data = await response.json();
 
-                        if (response.ok) {
-                            validCredentials.push({ email: tempSignUp.email, password: tempSignUp.password });
-                            localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
-                            localStorage.removeItem('tempSignUp');
-                            localStorage.removeItem('tempOTP');
-                            showAlert('✅ Sign-up successful! You can now log in.', 'success');
-                            closeModals();
-                            return;
-                        } else {
-                            throw new Error(data.message || 'OTP verification failed');
-                        }
-                    } catch (backendError) {
-                        console.log('Backend OTP verification failed, using client-side verification:', backendError.message);
-                        // Fall through to client-side verification
-                    }
-                }
+                         if (response.ok) {
+                             // Add to valid credentials
+                             validCredentials.push({ email: tempSignUp.email, password: tempSignUp.password });
+                             localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+                             
+                             // Clean up temporary data
+                             localStorage.removeItem('tempSignUp');
+                             localStorage.removeItem('tempOTP');
+                             
+                             // Use the token from backend response
+                             const token = data.data.token;
+                             const user = data.data.user;
+                             
+                             localStorage.setItem('token', token);
+                             localStorage.setItem('isLoggedIn', 'true');
+                             localStorage.setItem('userEmail', user.email);
+                             localStorage.setItem('userData', JSON.stringify(user));
+                             
+                             showAlert('✅ Account verified and logged in successfully!', 'success');
+                             closeModals();
+                             
+                             // Redirect to main page
+                             setTimeout(() => {
+                                 window.location.href = 'index.html';
+                             }, 1500);
+                             return;
+                         } else {
+                             throw new Error(data.message || 'OTP verification failed');
+                         }
+                     } catch (backendError) {
+                         console.log('Backend OTP verification failed, using client-side verification:', backendError.message);
+                         // Fall through to client-side verification
+                     }
+                 }
 
-                // Client-side OTP verification
-                console.log('Using client-side OTP verification');
-                
-                if (otp === storedOTP) {
-                    // Add new user to valid credentials
-                    validCredentials.push({ 
-                        email: tempSignUp.email, 
-                        password: tempSignUp.password,
-                        username: tempSignUp.username 
-                    });
-                    localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
-                    
-                    // Clean up temporary data
-                    localStorage.removeItem('tempSignUp');
-                    localStorage.removeItem('tempOTP');
-                    
-                    showAlert('✅ Account verified successfully! You can now log in.', 'success');
-                    closeModals();
-                } else {
-                    showAlert('❌ Invalid OTP. Please check and try again.', 'error');
-                }
-                
-            } catch (error) {
-                console.error('OTP verification error:', error);
-                showAlert('❌ Verification failed. Please try again.', 'error');
-            } finally {
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        });
+                 // Client-side OTP verification
+                 console.log('Using client-side OTP verification');
+                 
+                 if (otp === storedOTP) {
+                     // Add new user to valid credentials
+                     validCredentials.push({ 
+                         email: tempSignUp.email, 
+                         password: tempSignUp.password,
+                         username: tempSignUp.username 
+                     });
+                     localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+                     
+                     // Clean up temporary data
+                     localStorage.removeItem('tempSignUp');
+                     localStorage.removeItem('tempOTP');
+                     
+                     // Automatically log the user in
+                     const mockToken = btoa(JSON.stringify({
+                         userId: Date.now(),
+                         email: tempSignUp.email,
+                         exp: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
+                     }));
+                     
+                     localStorage.setItem('token', mockToken);
+                     localStorage.setItem('isLoggedIn', 'true');
+                     localStorage.setItem('userEmail', tempSignUp.email);
+                     localStorage.setItem('userData', JSON.stringify({
+                         id: Date.now(),
+                         email: tempSignUp.email,
+                         username: tempSignUp.username
+                     }));
+                     
+                     showAlert('✅ Account verified and logged in successfully!', 'success');
+                     closeModals();
+                     
+                     // Redirect to main page
+                     setTimeout(() => {
+                         window.location.href = 'index.html';
+                     }, 1500);
+                 } else {
+                     showAlert('❌ Invalid OTP. Please check and try again.', 'error');
+                 }
+                 
+             } catch (error) {
+                 console.error('OTP verification error:', error);
+                 showAlert('❌ Verification failed. Please try again.', 'error');
+             } finally {
+                 // Reset button state
+                 submitBtn.textContent = originalText;
+                 submitBtn.disabled = false;
+             }
+         });
 
                  // Forgot Password Form Submission - Enhanced for hosted environment
          document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
@@ -1287,14 +1332,98 @@
             }
         }
 
-        // Check if user is already logged in
-        document.addEventListener('DOMContentLoaded', function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            if (isLoggedIn === 'true') {
-                // User is logged in, redirect to main page
-                window.location.href = 'index.html';
-            }
-        });
+                 // Resend OTP functionality
+         let resendTimer = null;
+         let countdownInterval = null;
+
+         function startResendTimer() {
+             const resendBtn = document.getElementById('resendOtpBtn');
+             const resendText = document.getElementById('resendText');
+             const resendTimer = document.getElementById('resendTimer');
+             const countdown = document.getElementById('countdown');
+             
+             resendBtn.disabled = true;
+             resendText.style.display = 'none';
+             resendTimer.style.display = 'inline';
+             
+             let timeLeft = 60;
+             countdown.textContent = timeLeft;
+             
+             countdownInterval = setInterval(() => {
+                 timeLeft--;
+                 countdown.textContent = timeLeft;
+                 
+                 if (timeLeft <= 0) {
+                     clearInterval(countdownInterval);
+                     resendBtn.disabled = false;
+                     resendText.style.display = 'inline';
+                     resendTimer.style.display = 'none';
+                 }
+             }, 1000);
+         }
+
+         async function resendOTP() {
+             const tempSignUp = JSON.parse(localStorage.getItem('tempSignUp'));
+             
+             if (!tempSignUp) {
+                 showAlert('❌ No pending registration found. Please sign up again.', 'error');
+                 return;
+             }
+
+             const resendBtn = document.getElementById('resendOtpBtn');
+             resendBtn.disabled = true;
+             
+             try {
+                 // First, try backend resend
+                 const serverConnected = await testServerConnection();
+                 
+                 if (serverConnected) {
+                     try {
+                         const response = await fetch(`${API_BASE_URL}/api/auth/resend-otp`, {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify({ email: tempSignUp.email })
+                         });
+                         const data = await response.json();
+
+                         if (response.ok) {
+                             showAlert('✅ New OTP sent to your email!', 'success');
+                             startResendTimer();
+                             return;
+                         } else {
+                             throw new Error(data.message || 'Failed to resend OTP');
+                         }
+                     } catch (backendError) {
+                         console.log('Backend resend failed, using client-side:', backendError.message);
+                         // Fall through to client-side resend
+                     }
+                 }
+
+                 // Client-side resend
+                 console.log('Using client-side resend OTP');
+                 
+                 // Generate new OTP
+                 const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                 localStorage.setItem('tempOTP', newOtp);
+                 
+                 showAlert(`✅ New OTP sent! Your OTP is: ${newOtp}`, 'success');
+                 startResendTimer();
+                 
+             } catch (error) {
+                 console.error('Resend OTP error:', error);
+                 showAlert('❌ Failed to resend OTP. Please try again.', 'error');
+                 resendBtn.disabled = false;
+             }
+         }
+
+         // Check if user is already logged in
+         document.addEventListener('DOMContentLoaded', function() {
+             const isLoggedIn = localStorage.getItem('isLoggedIn');
+             if (isLoggedIn === 'true') {
+                 // User is logged in, redirect to main page
+                 window.location.href = 'index.html';
+             }
+         });
     </script>
 </body>
 </html>
