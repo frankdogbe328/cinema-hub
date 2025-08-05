@@ -829,7 +829,7 @@
             .nav-links {
                 display: none;
             }
-            
+
             .nav-container {
                 padding: 0.8rem 1rem;
             }
@@ -3290,7 +3290,7 @@
                                 <!-- YouTube videos will be populated here -->
                             </div>
                         </div>
-
+                        
                         <!-- Trakt Tab -->
                         <div class="tab-pane" id="trakt-tab">
                             <div class="tab-header">
@@ -4701,21 +4701,21 @@
 
             // Check if elements exist before adding event listeners
             if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => {
+            searchBtn.addEventListener('click', () => {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchYouTube(query);
+                }
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
                     const query = searchInput.value.trim();
                     if (query) {
                         searchYouTube(query);
                     }
-                });
-
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        const query = searchInput.value.trim();
-                        if (query) {
-                            searchYouTube(query);
-                        }
-                    }
-                });
+                }
+            });
             }
         }
 
@@ -4723,7 +4723,7 @@
             const searchInput = document.getElementById('youtubeSearchInput');
             if (searchInput) {
                 searchInput.value = query;
-                searchYouTube(query);
+            searchYouTube(query);
             }
         }
 
@@ -4923,11 +4923,11 @@
         // Tabbed Interface Functions
         function switchTab(tabName) {
             try {
-                // Remove active class from all tabs and panes
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-                
-                // Add active class to selected tab and pane
+            // Remove active class from all tabs and panes
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to selected tab and pane
                 const tabButton = document.querySelector(`[data-tab="${tabName}"]`);
                 const tabPane = document.getElementById(`${tabName}-tab`);
                 
@@ -5189,7 +5189,7 @@
             movies.forEach((movie, index) => {
                 try {
                     const movieCard = createTraktMovieCard(movie);
-                    grid.appendChild(movieCard);
+                grid.appendChild(movieCard);
                 } catch (error) {
                     console.error(`Error creating card for ${movie.title}:`, error);
                 }
@@ -5221,7 +5221,7 @@
             updateTabCount('local', filteredMovies.length);
         }
 
-
+            
 
         // External link functions
         function openGoogleSearch() {
