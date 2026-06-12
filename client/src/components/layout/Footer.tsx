@@ -28,8 +28,16 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-border/60 py-4 text-center text-[12px] sm:text-xs text-muted-foreground px-4">
-        © {new Date().getFullYear()} CinemaHub by Frank Dogbe. All rights reserved.
+      <div className="border-t border-border/60 py-5 px-4 text-center space-y-1.5">
+        <p className="text-[12px] sm:text-xs text-muted-foreground">
+          © {new Date().getFullYear()} CinemaHub by Frank Dogbe. All rights reserved.
+        </p>
+        <p className="text-[11px] sm:text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">
+          Developed &amp; Powered by{" "}
+          <span className="font-brand font-bold tracking-tight normal-case text-foreground">
+            Softvara<span className="text-brand">.</span>
+          </span>
+        </p>
       </div>
     </footer>
   );

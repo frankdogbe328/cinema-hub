@@ -14,7 +14,8 @@ interface Props {
   title?: string;
 }
 
-const LOAD_TIMEOUT_MS = 9000;
+const LOAD_TIMEOUT_MS = 8000;
+const AUTO_FALLBACK_AFTER = 2;   // after N failed servers, switch to manual prompt
 
 export function StreamPlayer({
   open,
@@ -29,6 +30,7 @@ export function StreamPlayer({
   const [iframeKey, setIframeKey] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [stalled, setStalled] = useState(false);
+  const [autoTried, setAutoTried] = useState(0);
   const stallTimer = useRef<number | null>(null);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export function StreamPlayer({
       setIframeKey((k) => k + 1);
       setLoaded(false);
       setStalled(false);
+      setAutoTried(0);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -51,7 +54,16 @@ export function StreamPlayer({
     setStalled(false);
     if (stallTimer.current) window.clearTimeout(stallTimer.current);
     stallTimer.current = window.setTimeout(() => {
-      if (!loaded) setStalled(true);
+      if (loaded) return;
+      // Auto-advance to the next server up to AUTO_FALLBACK_AFTER times before
+      // surfacing the manual "try next" prompt. Most movies play on one of the
+      // first three servers; this hides the failure from the user.
+      if (autoTried < AUTO_FALLBACK_AFTER) {
+        setAutoTried((n) => n + 1);
+        setActiveIdx((i) => (i + 1) % STREAM_SOURCES.length);
+      } else {
+        setStalled(true);
+      }
     }, LOAD_TIMEOUT_MS);
     return () => {
       if (stallTimer.current) window.clearTimeout(stallTimer.current);
@@ -71,6 +83,7 @@ export function StreamPlayer({
   }, [open, activeIdx]);
 
   const tryNext = () => {
+    setAutoTried(0);
     setActiveIdx((i) => (i + 1) % STREAM_SOURCES.length);
   };
 
@@ -150,7 +163,10 @@ export function StreamPlayer({
           <div className="absolute inset-0 grid place-items-center z-10">
             <div className="flex flex-col items-center gap-3 text-muted-foreground">
               <div className="size-10 rounded-full border-2 border-brand border-t-transparent animate-spin" />
-              <p className="text-sm">Connecting to {source.tagline || source.name}…</p>
+              <p className="text-sm">
+                {autoTried > 0 ? "Auto-switching…" : "Connecting to"} {source.tagline || source.name}
+                {autoTried > 0 && <span className="opacity-60"> · attempt {autoTried + 1}</span>}
+              </p>
             </div>
           </div>
         )}

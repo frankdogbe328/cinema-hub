@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Play, Info, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,28 @@ export function HeroBanner({ movies, isLoading }: Props) {
   const slides = (movies ?? []).filter((m) => m.backdrop_path).slice(0, 5);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (slides.length < 2 || paused) return;
     const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 8000);
     return () => clearInterval(t);
   }, [slides.length, paused]);
+
+  // Spotlight cursor — radial brand glow follows mouse over the hero
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const onMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      el.style.setProperty("--spotlight-x", `${x}%`);
+      el.style.setProperty("--spotlight-y", `${y}%`);
+    };
+    el.addEventListener("mousemove", onMove);
+    return () => el.removeEventListener("mousemove", onMove);
+  }, []);
 
   if (isLoading || slides.length === 0) {
     return <Skeleton className="h-[70vh] min-h-[480px] w-full rounded-none" />;
@@ -32,20 +48,22 @@ export function HeroBanner({ movies, isLoading }: Props) {
 
   return (
     <section
-      className="relative h-[70vh] min-h-[440px] max-h-[820px] sm:h-[78vh] sm:min-h-[520px] w-full overflow-hidden -mt-16 pt-16"
+      ref={sectionRef}
+      className="spotlight relative h-[70vh] min-h-[440px] max-h-[820px] sm:h-[78vh] sm:min-h-[520px] w-full overflow-hidden -mt-16 pt-16"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       {slides.map((m, i) => {
         const src = tmdbImage(m.backdrop_path, "original");
         if (!src) return null;
+        const active = i === idx;
         return (
           <img
-            key={m.id}
+            key={`${m.id}-${idx === i ? "active" : "idle"}`}
             src={src}
             alt={m.title || m.name || ""}
-            className={`absolute inset-0 size-full object-cover transition-all duration-[1500ms] ease-out ${
-              i === idx ? "opacity-100 scale-100" : "opacity-0 scale-110"
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-[1500ms] ease-out ${
+              active ? "opacity-100 ken-burns" : "opacity-0"
             }`}
           />
         );

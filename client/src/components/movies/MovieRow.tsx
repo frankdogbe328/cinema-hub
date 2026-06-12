@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { MovieCard } from "./MovieCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useReveal } from "@/hooks/useReveal";
 import type { Movie } from "@/lib/types";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 
 export function MovieRow({ title, subtitle, movies, isLoading, seeAllHref }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useReveal<HTMLElement>();
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
 
@@ -43,7 +45,7 @@ export function MovieRow({ title, subtitle, movies, isLoading, seeAllHref }: Pro
   };
 
   return (
-    <section className="space-y-3 group/row">
+    <section ref={sectionRef} className="space-y-3 group/row reveal">
       <div className="container flex items-end justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-display font-bold tracking-tight">{title}</h2>

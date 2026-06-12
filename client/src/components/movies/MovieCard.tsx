@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Star, Play } from "lucide-react";
-import { tmdbImage, formatYear, cn } from "@/lib/utils";
+import { formatYear, cn } from "@/lib/utils";
+import { PosterImage } from "./PosterImage";
 import type { Movie } from "@/lib/types";
 
 interface Props {
@@ -9,7 +10,6 @@ interface Props {
 }
 
 export function MovieCard({ movie, size = "md" }: Props) {
-  const poster = tmdbImage(movie.poster_path, "w500");
   const title = movie.title || movie.name || "Untitled";
   const year = formatYear(movie.release_date || movie.first_air_date);
 
@@ -23,17 +23,13 @@ export function MovieCard({ movie, size = "md" }: Props) {
         size === "lg" && "w-full"
       )}
     >
-      <div className="relative aspect-[2/3] bg-secondary overflow-hidden">
-        {poster ? (
-          <img
-            src={poster}
-            alt={title}
-            loading="lazy"
-            className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        ) : (
-          <div className="grid h-full place-items-center text-muted-foreground text-xs">No image</div>
-        )}
+      <div className="relative aspect-[2/3] overflow-hidden">
+        <PosterImage
+          path={movie.poster_path}
+          alt={title}
+          size="w500"
+          className="size-full transition-transform duration-700 group-hover:scale-110"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <span className="grid place-items-center h-12 w-12 rounded-full bg-brand text-white shadow-xl shadow-brand/40">
