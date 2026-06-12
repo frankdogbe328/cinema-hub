@@ -67,6 +67,8 @@ connectDB().catch((err) => {
 });
 
 // API routes
+// TMDB is the single source of truth for movie metadata.
+// Auth, watchlist, reviews, recommendations are first-party (Mongo-backed).
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/auth', require('./routes/google-auth'));
 app.use('/api/users', require('./routes/users'));
@@ -74,9 +76,6 @@ app.use('/api/watchlist', require('./routes/watchlist'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/recommendations', require('./routes/recommendations'));
 app.use('/api/tmdb', require('./routes/tmdb'));
-app.use('/api/movies', require('./routes/movies'));
-app.use('/api/youtube', require('./routes/youtube'));
-app.use('/api/trakt', require('./routes/trakt'));
 app.use('/api/_diag', require('./routes/diag'));
 
 app.get('/api/health', (_req, res) => {
