@@ -60,12 +60,10 @@ app.use(
   })
 );
 
-// Connect to MongoDB (fire-and-forget; routes that require DB use requireDB middleware)
+// Connect to MongoDB (fire-and-forget; routes that need DB use requireDB middleware).
+// We NEVER exit on failure here — that would kill the Vercel function permanently.
 connectDB().catch((err) => {
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-    console.error('Fatal: DB connection required in production', err);
-    process.exit(1);
-  }
+  console.error('⚠️  MongoDB connect failed (will retry on first DB-bound request):', err?.message || err);
 });
 
 // API routes
