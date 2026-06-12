@@ -5,9 +5,9 @@ const { LRUCache } = require('lru-cache');
 const router = express.Router();
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
-// Trim whitespace/newlines — Vercel env paste sometimes carries them, which makes
-// Node reject the Authorization header with "Invalid character in header content".
-const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '').trim();
+// Strip ALL whitespace — Vercel env paste sometimes injects newlines mid-value when
+// the source UI wraps long strings. JWTs contain no whitespace so this is lossless.
+const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '').replace(/\s+/g, '');
 
 const cache = new LRUCache({
   max: 500,

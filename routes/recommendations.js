@@ -6,7 +6,7 @@ const { optionalAuth } = require('../middleware/auth');
 const { requireDB } = require('../db');
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
-const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '').trim();
+const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '').replace(/\s+/g, '');
 
 router.get('/', requireDB, optionalAuth, async (req, res) => {
   try {

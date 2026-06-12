@@ -7,7 +7,9 @@ if (!cached) cached = global.__mongooseConn = { conn: null, promise: null };
 async function connectDB() {
   if (cached.conn) return cached.conn;
 
-  const uri = process.env.MONGODB_URI;
+  // Strip whitespace — Vercel env paste sometimes injects newlines mid-value.
+  // The Mongo connection string has no whitespace, so this is lossless.
+  const uri = (process.env.MONGODB_URI || '').replace(/\s+/g, '');
   if (!uri) {
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
       console.error('❌  MONGODB_URI not set — DB-dependent routes will return 503.');
