@@ -20,6 +20,28 @@ function describe(name, opts = {}) {
   };
 }
 
+const mongoose = require('mongoose');
+const { connectDB } = require('../db');
+
+router.get('/db', async (_req, res) => {
+  const before = mongoose.connection.readyState;
+  let connectErr = null;
+  try {
+    await connectDB();
+  } catch (e) {
+    connectErr = { name: e.name, message: e.message };
+  }
+  const after = mongoose.connection.readyState;
+  const stateNames = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  res.json({
+    before: { code: before, name: stateNames[before] || '?' },
+    after: { code: after, name: stateNames[after] || '?' },
+    host: mongoose.connection.host || null,
+    name: mongoose.connection.name || null,
+    connectErr,
+  });
+});
+
 router.get('/env', (_req, res) => {
   res.json({
     note: 'Diagnostic only. No secret values are returned in full.',

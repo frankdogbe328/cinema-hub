@@ -22,8 +22,10 @@ async function connectDB() {
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(uri, {
-        serverSelectionTimeoutMS: 8000,
-        dbName: process.env.MONGODB_DB_NAME || 'cinemahub',
+        serverSelectionTimeoutMS: 15000,
+        connectTimeoutMS: 15000,
+        socketTimeoutMS: 30000,
+        dbName: (process.env.MONGODB_DB_NAME || 'cinemahub').replace(/\s+/g, ''),
       })
       .then((conn) => {
         console.log(`✅ MongoDB connected: ${conn.connection.host}`);
@@ -31,13 +33,23 @@ async function connectDB() {
       })
       .catch((err) => {
         cached.promise = null;
-        console.error('❌ MongoDB connection error:', err.message);
-        return null;
+        cached.lastError = err;
+        console.error('❌ MongoDB connection error:', err.name, '-', err.message);
+        throw err;
       });
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  try {
+    cached.conn = await cached.promise;
+    return cached.conn;
+  } catch (err) {
+    cached.lastError = err;
+    return null;
+  }
+}
+
+function lastDBError() {
+  return cached.lastError || null;
 }
 
 function requireDB(req, res, next) {
@@ -46,9 +58,16 @@ function requireDB(req, res, next) {
   connectDB()
     .then(() => {
       if (mongoose.connection.readyState === 1) return next();
-      res.status(503).json({ message: 'Database unavailable. Check MONGODB_URI.' });
+      const e = lastDBError();
+      res.status(503).json({
+        message: 'Database unavailable. Check MONGODB_URI and Atlas Network Access (allow 0.0.0.0/0).',
+        cause: e ? `${e.name}: ${e.message}` : null,
+      });
     })
-    .catch(() => res.status(503).json({ message: 'Database unavailable.' }));
+    .catch((err) => res.status(503).json({
+      message: 'Database unavailable.',
+      cause: err ? `${err.name}: ${err.message}` : null,
+    }));
 }
 
-module.exports = { connectDB, requireDB };
+module.exports = { connectDB, requireDB, lastDBError };
