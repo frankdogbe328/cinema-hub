@@ -5,7 +5,9 @@ const { LRUCache } = require('lru-cache');
 const router = express.Router();
 
 const TMDB_BASE = 'https://api.themoviedb.org/3';
-const TMDB_KEY = process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '';
+// Trim whitespace/newlines — Vercel env paste sometimes carries them, which makes
+// Node reject the Authorization header with "Invalid character in header content".
+const TMDB_KEY = (process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN || '').trim();
 
 const cache = new LRUCache({
   max: 500,
