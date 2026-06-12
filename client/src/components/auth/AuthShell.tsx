@@ -107,7 +107,7 @@ export function AuthShell({ title, subtitle, children, footer }: Props) {
 
       {/* Form side */}
       <div
-        className="relative flex flex-col justify-center px-6 py-10 sm:px-12"
+        className="relative flex flex-col justify-center px-5 py-8 sm:px-12 sm:py-10"
         style={
           currentBg
             ? {
@@ -130,15 +130,15 @@ export function AuthShell({ title, subtitle, children, footer }: Props) {
           </span>
         </Link>
 
-        <div className="w-full max-w-md mx-auto space-y-7 animate-fade-in">
+        <div className="w-full max-w-md mx-auto space-y-6 sm:space-y-7 animate-fade-in">
           <div className="space-y-2">
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight">
+            <h1 className="font-display text-[28px] sm:text-4xl font-extrabold tracking-tight leading-tight">
               {title}
             </h1>
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
+            <p className="text-[15px] sm:text-sm text-muted-foreground leading-relaxed">{subtitle}</p>
           </div>
 
-          <div className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-xl p-6 sm:p-7 shadow-2xl shadow-black/40">
+          <div className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-xl p-5 sm:p-7 shadow-2xl shadow-black/40">
             {children}
           </div>
 

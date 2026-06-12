@@ -69,7 +69,7 @@ export function Navbar() {
             : "bg-background/80 backdrop-blur-xl border-b border-border/60"
         )}
       >
-        <div className="container flex h-16 items-center justify-between gap-4">
+        <div className="container flex h-16 sm:h-16 items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2 group shrink-0">
               <span className="grid place-items-center h-9 w-9 rounded-md bg-brand text-white shadow-lg shadow-brand/30 group-hover:scale-105 transition-transform">
@@ -138,7 +138,7 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
-                  className="grid place-items-center h-9 w-9 rounded-full bg-secondary border border-border overflow-hidden hover:ring-2 hover:ring-brand/50 transition"
+                  className="grid place-items-center h-10 w-10 rounded-full bg-secondary border border-border overflow-hidden hover:ring-2 hover:ring-brand/50 transition"
                   aria-label="Profile menu"
                 >
                   {user?.picture || user?.profile?.avatar ? (

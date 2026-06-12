@@ -32,7 +32,7 @@ export function HeroBanner({ movies, isLoading }: Props) {
 
   return (
     <section
-      className="relative h-[78vh] min-h-[520px] w-full overflow-hidden -mt-16 pt-16"
+      className="relative h-[70vh] min-h-[440px] max-h-[820px] sm:h-[78vh] sm:min-h-[520px] w-full overflow-hidden -mt-16 pt-16"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -53,33 +53,33 @@ export function HeroBanner({ movies, isLoading }: Props) {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/10" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
 
-      <div className="container relative h-full flex items-end pb-16 sm:pb-24">
-        <div key={movie.id} className="max-w-2xl space-y-4 animate-fade-in">
+      <div className="container relative h-full flex items-end pb-20 sm:pb-24">
+        <div key={movie.id} className="max-w-2xl space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex items-center gap-2 flex-wrap text-sm">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-xs font-bold text-white tracking-wide shadow-lg shadow-brand/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-bold text-white tracking-wide shadow-lg shadow-brand/30">
               <Play className="size-3 fill-current" /> #{idx + 1} Trending
             </span>
             {movie.vote_average > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold backdrop-blur-sm">
                 <Star className="size-3 fill-yellow-400 text-yellow-400" />
                 {movie.vote_average.toFixed(1)}
               </span>
             )}
-            {year && <span className="text-muted-foreground">{year}</span>}
+            {year && <span className="text-sm text-muted-foreground">{year}</span>}
           </div>
-          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-balance drop-shadow-2xl">
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight text-balance drop-shadow-2xl leading-[1.05]">
             {title}
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground line-clamp-3 max-w-xl leading-relaxed">
+          <p className="text-[15px] sm:text-base lg:text-lg text-muted-foreground/90 line-clamp-3 max-w-xl leading-relaxed">
             {movie.overview}
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild size="lg" className="gap-2">
+          <div className="flex flex-wrap gap-2 sm:gap-3 pt-1 sm:pt-2">
+            <Button asChild size="lg" className="gap-2 h-12">
               <Link to={`/movie/${movie.id}`}>
-                <Play className="size-4 fill-current" /> Watch trailer
+                <Play className="size-4 fill-current" /> Watch
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary" className="gap-2">
+            <Button asChild size="lg" variant="secondary" className="gap-2 h-12">
               <Link to={`/movie/${movie.id}`}>
                 <Info className="size-4" /> More info
               </Link>
@@ -89,17 +89,17 @@ export function HeroBanner({ movies, isLoading }: Props) {
       </div>
 
       {/* Slide controls */}
-      <div className="absolute bottom-6 right-6 sm:right-10 hidden sm:flex items-center gap-2 z-10">
+      <div className="absolute bottom-6 right-4 sm:right-10 hidden sm:flex items-center gap-2 z-10">
         <button
           onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
-          className="grid place-items-center h-10 w-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur transition-colors"
+          className="grid place-items-center h-11 w-11 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur transition-colors"
           aria-label="Previous slide"
         >
           <ChevronLeft className="size-4" />
         </button>
         <button
           onClick={() => setIdx((i) => (i + 1) % slides.length)}
-          className="grid place-items-center h-10 w-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur transition-colors"
+          className="grid place-items-center h-11 w-11 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur transition-colors"
           aria-label="Next slide"
         >
           <ChevronRight className="size-4" />
@@ -107,7 +107,7 @@ export function HeroBanner({ movies, isLoading }: Props) {
       </div>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:bottom-8 sm:right-32 flex gap-1.5 z-10">
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-32 flex gap-1.5 z-10">
         {slides.map((s, i) => (
           <button
             key={s.id}

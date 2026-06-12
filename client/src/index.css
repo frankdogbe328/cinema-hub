@@ -24,10 +24,20 @@
     --input: 240 6% 18%;
     --ring: 356 95% 47%;
     --radius: 0.75rem;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
   }
 
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
   }
 
   html,
@@ -37,12 +47,32 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased text-[15px] sm:text-base;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
     background:
-      radial-gradient(1200px 600px at 80% -10%, hsl(356 95% 47% / 0.08), transparent 60%),
-      radial-gradient(900px 600px at -10% 10%, hsl(240 80% 30% / 0.06), transparent 60%),
+      radial-gradient(60vmax 40vmax at 80% -10%, hsl(356 95% 47% / 0.08), transparent 60%),
+      radial-gradient(50vmax 40vmax at -10% 10%, hsl(240 80% 30% / 0.06), transparent 60%),
       hsl(var(--background));
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  /* iOS form zoom prevention — inputs ≥ 16px don't zoom */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  @screen sm {
+    input,
+    select,
+    textarea {
+      font-size: 14px;
+    }
+  }
+
+  button {
+    touch-action: manipulation;
   }
 
   ::selection {
@@ -68,5 +98,14 @@
   .mask-fade-b {
     -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent);
     mask-image: linear-gradient(to bottom, black 40%, transparent);
+  }
+  .pb-safe {
+    padding-bottom: calc(0.75rem + var(--safe-bottom));
+  }
+  .pt-safe {
+    padding-top: calc(0.75rem + var(--safe-top));
+  }
+  .mb-safe {
+    margin-bottom: var(--safe-bottom);
   }
 }

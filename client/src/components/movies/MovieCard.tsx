@@ -19,7 +19,7 @@ export function MovieCard({ movie, size = "md" }: Props) {
       className={cn(
         "group relative block overflow-hidden rounded-lg bg-card border border-border/40 transition-all hover:border-brand/60 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         size === "sm" && "w-32 sm:w-36",
-        size === "md" && "w-40 sm:w-44 md:w-48",
+        size === "md" && "w-36 sm:w-44 md:w-48",
         size === "lg" && "w-full"
       )}
     >
@@ -47,9 +47,9 @@ export function MovieCard({ movie, size = "md" }: Props) {
           </div>
         )}
       </div>
-      <div className="p-2.5">
-        <p className="line-clamp-1 text-sm font-semibold group-hover:text-brand transition-colors">{title}</p>
-        {year && <p className="text-xs text-muted-foreground mt-0.5">{year}</p>}
+      <div className="p-2.5 sm:p-3">
+        <p className="line-clamp-1 text-[14px] sm:text-sm font-semibold leading-tight group-hover:text-brand transition-colors">{title}</p>
+        {year && <p className="text-[12px] sm:text-xs text-muted-foreground mt-1">{year}</p>}
       </div>
     </Link>
   );

@@ -196,7 +196,7 @@ export function StreamPlayer({
       </div>
 
       {/* Server picker */}
-      <div className="border-t border-white/10 bg-black/70 backdrop-blur">
+      <div className="border-t border-white/10 bg-black/70 backdrop-blur pb-safe">
         <div className="px-4 sm:px-6 py-3 space-y-3 max-h-[34vh] overflow-y-auto">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

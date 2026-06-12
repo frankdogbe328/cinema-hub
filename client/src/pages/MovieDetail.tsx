@@ -137,7 +137,7 @@ export default function MovieDetail() {
   };
 
   return (
-    <div className="pb-32 sm:pb-20">
+    <div className="pb-[7.5rem] sm:pb-20">
       <section className="relative h-[55vh] min-h-[440px] w-full overflow-hidden -mt-16">
         {backdrop && <img src={backdrop} alt={title} className="absolute inset-0 size-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
@@ -157,7 +157,7 @@ export default function MovieDetail() {
           <div className="space-y-5">
             <div className="space-y-2">
               {m.tagline && <p className="text-sm uppercase tracking-widest text-brand font-semibold">{m.tagline}</p>}
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-balance">
+              <h1 className="font-display text-[28px] sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-balance leading-[1.1]">
                 {title}
               </h1>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
@@ -188,7 +188,7 @@ export default function MovieDetail() {
               </div>
             </div>
 
-            <p className="text-base text-muted-foreground max-w-3xl leading-relaxed">{m.overview}</p>
+            <p className="text-[15px] sm:text-base text-muted-foreground max-w-3xl leading-relaxed">{m.overview}</p>
 
             <div className="hidden sm:flex flex-wrap gap-3">
               <Button size="lg" className="gap-2" onClick={() => setShowStream(true)}>
@@ -231,7 +231,7 @@ export default function MovieDetail() {
                 <h2 className="text-xl font-display font-bold">Cast</h2>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
                   {cast.map((c) => (
-                    <div key={c.id} className="shrink-0 w-24 text-center">
+                    <div key={c.id} className="shrink-0 w-[88px] sm:w-24 text-center">
                       <div className="aspect-square w-full overflow-hidden rounded-full bg-secondary border border-border ring-1 ring-transparent hover:ring-brand/40 transition">
                         {c.profile_path ? (
                           <img
@@ -241,13 +241,13 @@ export default function MovieDetail() {
                             loading="lazy"
                           />
                         ) : (
-                          <div className="grid h-full place-items-center text-xs text-muted-foreground">
+                          <div className="grid h-full place-items-center text-sm text-muted-foreground">
                             {c.name.slice(0, 1)}
                           </div>
                         )}
                       </div>
-                      <p className="mt-2 text-xs font-semibold line-clamp-1">{c.name}</p>
-                      <p className="text-[11px] text-muted-foreground line-clamp-1">{c.character}</p>
+                      <p className="mt-2 text-[13px] sm:text-xs font-semibold line-clamp-1">{c.name}</p>
+                      <p className="text-[11px] sm:text-[11px] text-muted-foreground line-clamp-1">{c.character}</p>
                     </div>
                   ))}
                 </div>
@@ -324,21 +324,21 @@ export default function MovieDetail() {
       </div>
 
       {/* Sticky mobile CTA */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl p-3 flex gap-2">
-        <Button size="lg" className="flex-1 gap-2" onClick={() => setShowStream(true)}>
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl px-3 pt-3 pb-safe flex gap-2">
+        <Button size="lg" className="flex-1 gap-2 h-12" onClick={() => setShowStream(true)}>
           <Play className="size-4 fill-current" /> Watch
         </Button>
         <Button
           size="lg"
           variant="secondary"
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 h-12"
           onClick={handleWatchlist}
           disabled={addWl.isPending || removeWl.isPending}
         >
           {inWatchlist ? <Check className="size-4" /> : <Plus className="size-4" />}
           {inWatchlist ? "Saved" : "Save"}
         </Button>
-        <Button size="lg" variant="outline" className="px-3" onClick={handleShare} aria-label="Share">
+        <Button size="lg" variant="outline" className="px-3 h-12 w-12" onClick={handleShare} aria-label="Share">
           <Share2 className="size-4" />
         </Button>
       </div>

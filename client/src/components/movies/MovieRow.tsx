@@ -82,14 +82,14 @@ export function MovieRow({ title, subtitle, movies, isLoading, seeAllHref }: Pro
         </div>
       </div>
 
-      <div className="relative">
+      <div className="container relative !px-0">
         <div
           ref={scrollRef}
-          className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 px-4 sm:px-[max(1rem,calc((100vw-1400px)/2+1rem))] scrollbar-hide scroll-smooth snap-x snap-mandatory md:snap-none"
+          className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 px-4 sm:px-5 md:px-6 lg:px-8 scrollbar-hide scroll-smooth snap-x snap-mandatory md:snap-none overscroll-x-contain"
         >
           {isLoading
             ? Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[2/3] w-40 sm:w-44 md:w-48 shrink-0 rounded-lg" />
+                <Skeleton key={i} className="aspect-[2/3] w-36 sm:w-44 md:w-48 shrink-0 rounded-lg" />
               ))
             : movies?.map((m) => (
                 <div key={m.id} className="shrink-0 snap-start">
