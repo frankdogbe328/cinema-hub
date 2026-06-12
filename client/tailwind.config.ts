@@ -77,7 +77,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        display: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Sora", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        brand: ["Sora", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

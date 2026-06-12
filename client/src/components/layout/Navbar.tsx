@@ -1,9 +1,10 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Film, Search as SearchIcon, Bookmark, User as UserIcon, LogOut, LogIn, Menu, X, Home, Compass } from "lucide-react";
+import { Search as SearchIcon, Bookmark, User as UserIcon, LogOut, LogIn, Menu, X, Home, Compass } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LogoLockup } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -71,13 +72,8 @@ export function Navbar() {
       >
         <div className="container flex h-16 sm:h-16 items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2 group shrink-0">
-              <span className="grid place-items-center h-9 w-9 rounded-md bg-brand text-white shadow-lg shadow-brand/30 group-hover:scale-105 transition-transform">
-                <Film className="size-5" />
-              </span>
-              <span className="font-display text-lg font-bold tracking-tight">
-                Cinema<span className="text-brand">Hub</span>
-              </span>
+            <Link to="/" aria-label="CinemaHub home" className="shrink-0">
+              <LogoLockup size="md" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">

@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Film, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { tmdb } from "@/lib/tmdb";
 import { tmdbImage } from "@/lib/utils";
+import { LogoLockup } from "@/components/brand/Logo";
 
 interface Props {
   title: string;
@@ -51,13 +52,8 @@ export function AuthShell({ title, subtitle, children, footer }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
 
         <div className="relative z-10 flex h-full flex-col justify-between p-12">
-          <Link to="/" className="inline-flex items-center gap-2 group w-fit">
-            <span className="grid place-items-center h-10 w-10 rounded-md bg-brand text-white shadow-2xl shadow-brand/40 group-hover:scale-105 transition-transform">
-              <Film className="size-5" />
-            </span>
-            <span className="font-display text-xl font-bold tracking-tight">
-              Cinema<span className="text-brand">Hub</span>
-            </span>
+          <Link to="/" aria-label="CinemaHub home" className="w-fit">
+            <LogoLockup size="md" />
           </Link>
 
           <div className="space-y-4 max-w-md">
@@ -120,14 +116,10 @@ export function AuthShell({ title, subtitle, children, footer }: Props) {
       >
         <Link
           to="/"
-          className="lg:hidden inline-flex items-center gap-2 mb-8 self-center"
+          aria-label="CinemaHub home"
+          className="lg:hidden mb-7 self-center"
         >
-          <span className="grid place-items-center h-10 w-10 rounded-md bg-brand text-white shadow-lg shadow-brand/30">
-            <Film className="size-5" />
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight">
-            Cinema<span className="text-brand">Hub</span>
-          </span>
+          <LogoLockup size="md" />
         </Link>
 
         <div className="w-full max-w-md mx-auto space-y-6 sm:space-y-7 animate-fade-in">
