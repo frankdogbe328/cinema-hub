@@ -77,6 +77,7 @@ app.use('/api/tmdb', require('./routes/tmdb'));
 app.use('/api/movies', require('./routes/movies'));
 app.use('/api/youtube', require('./routes/youtube'));
 app.use('/api/trakt', require('./routes/trakt'));
+app.use('/api/_diag', require('./routes/diag'));
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
