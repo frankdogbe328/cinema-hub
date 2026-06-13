@@ -1,7 +1,7 @@
 // Movie/TV streaming embed registry.
 // Each provider takes a TMDB id and returns an iframe URL.
-// 16 servers across 3 tiers — if a movie isn't on one server it's almost
-// certainly on another. Auto-fallback kicks in after an 8s stall.
+// Ordered by current reliability (Dec 2026). If a provider goes dark we
+// just remove it; users fall through to the next.
 
 export type Tier = "primary" | "hd" | "backup";
 
@@ -14,12 +14,27 @@ export interface StreamSource {
   tv?: (tmdbId: number | string, season: number, episode: number) => string;
 }
 
-// Ordered roughly by current reliability + speed. First server = default.
 export const STREAM_SOURCES: StreamSource[] = [
-  // --- PRIMARY (fastest, lowest ad load, most reliable) ---
+  // --- PRIMARY (newest + most reliable as of late 2026) ---
+  {
+    id: "vidking",
+    name: "Server 1",
+    tagline: "VidKing · HD",
+    tier: "primary",
+    movie: (id) => `https://www.vidking.net/embed/movie/${id}?color=e50914&autoPlay=true`,
+    tv: (id, s, e) => `https://www.vidking.net/embed/tv/${id}/${s}/${e}?color=e50914&autoPlay=true`,
+  },
+  {
+    id: "videasy",
+    name: "Server 2",
+    tagline: "Videasy · Fast",
+    tier: "primary",
+    movie: (id) => `https://player.videasy.net/movie/${id}?color=e50914`,
+    tv: (id, s, e) => `https://player.videasy.net/tv/${id}/${s}/${e}?color=e50914`,
+  },
   {
     id: "embedsu",
-    name: "Server 1",
+    name: "Server 3",
     tagline: "Embed.su · HD",
     tier: "primary",
     movie: (id) => `https://embed.su/embed/movie/${id}`,
@@ -27,7 +42,7 @@ export const STREAM_SOURCES: StreamSource[] = [
   },
   {
     id: "vidsrc-cc-v3",
-    name: "Server 2",
+    name: "Server 4",
     tagline: "VidSrc · v3",
     tier: "primary",
     movie: (id) => `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=true`,
@@ -35,25 +50,17 @@ export const STREAM_SOURCES: StreamSource[] = [
   },
   {
     id: "vidlink",
-    name: "Server 3",
+    name: "Server 5",
     tagline: "VidLink · 4K",
     tier: "primary",
     movie: (id) => `https://vidlink.pro/movie/${id}?primaryColor=e50914&secondaryColor=ffffff&autoplay=true`,
     tv: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}?primaryColor=e50914&autoplay=true`,
   },
-  {
-    id: "vidsrc-dev",
-    name: "Server 4",
-    tagline: "VidSrc.dev",
-    tier: "primary",
-    movie: (id) => `https://vidsrc.dev/embed/movie/${id}`,
-    tv: (id, s, e) => `https://vidsrc.dev/embed/tv/${id}/${s}/${e}`,
-  },
 
-  // --- HD (good quality, may have a popup or brief ads) ---
+  // --- HD (good quality, may have a popup or ads) ---
   {
     id: "111movies",
-    name: "Server 5",
+    name: "Server 6",
     tagline: "111Movies",
     tier: "hd",
     movie: (id) => `https://111movies.com/movie/${id}`,
@@ -61,7 +68,7 @@ export const STREAM_SOURCES: StreamSource[] = [
   },
   {
     id: "autoembed",
-    name: "Server 6",
+    name: "Server 7",
     tagline: "AutoEmbed",
     tier: "hd",
     movie: (id) => `https://player.autoembed.cc/embed/movie/${id}`,
@@ -69,7 +76,7 @@ export const STREAM_SOURCES: StreamSource[] = [
   },
   {
     id: "vidsrc-to",
-    name: "Server 7",
+    name: "Server 8",
     tagline: "VidSrc.to",
     tier: "hd",
     movie: (id) => `https://vidsrc.to/embed/movie/${id}`,
@@ -77,19 +84,11 @@ export const STREAM_SOURCES: StreamSource[] = [
   },
   {
     id: "vidsrc-xyz",
-    name: "Server 8",
+    name: "Server 9",
     tagline: "VidSrc.xyz",
     tier: "hd",
     movie: (id) => `https://vidsrc.xyz/embed/movie?tmdb=${id}`,
     tv: (id, s, e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${s}&episode=${e}`,
-  },
-  {
-    id: "nontongo",
-    name: "Server 9",
-    tagline: "Nontongo",
-    tier: "hd",
-    movie: (id) => `https://www.nontongo.win/embed/movie/${id}`,
-    tv: (id, s, e) => `https://www.nontongo.win/embed/tv/${id}/${s}/${e}`,
   },
   {
     id: "moviesapi",
@@ -100,7 +99,7 @@ export const STREAM_SOURCES: StreamSource[] = [
     tv: (id, s, e) => `https://moviesapi.club/tv/${id}-${s}-${e}`,
   },
 
-  // --- BACKUP (aggregators, mirrors, last-resort) ---
+  // --- BACKUP (last resort, mirrors) ---
   {
     id: "multiembed",
     name: "Server 11",
@@ -134,16 +133,8 @@ export const STREAM_SOURCES: StreamSource[] = [
     tv: (id, s, e) => `https://embed.smashystream.com/playere.php?tmdb=${id}&season=${s}&episode=${e}`,
   },
   {
-    id: "frembed",
-    name: "Server 15",
-    tagline: "Frembed",
-    tier: "backup",
-    movie: (id) => `https://frembed.xyz/api/film.php?id=${id}`,
-    tv: (id, s, e) => `https://frembed.xyz/api/serie.php?id=${id}&sa=${s}&epi=${e}`,
-  },
-  {
     id: "fsapi",
-    name: "Server 16",
+    name: "Server 15",
     tagline: "FSAPI",
     tier: "backup",
     movie: (id) => `https://fsapi.xyz/movie/${id}`,

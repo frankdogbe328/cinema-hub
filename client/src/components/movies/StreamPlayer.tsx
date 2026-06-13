@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Server, AlertTriangle, RefreshCw, Maximize2, SkipForward } from "lucide-react";
+import { X, Server, AlertTriangle, RefreshCw, Maximize2, SkipForward, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { STREAM_SOURCES, TIER_LABEL, type Tier } from "@/lib/streamingSources";
 import { cn } from "@/lib/utils";
@@ -124,13 +124,24 @@ export function StreamPlayer({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 hidden sm:inline-flex text-foreground"
+            title="Open this server in a new tab — works even when iframe is blocked"
+          >
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="size-3.5" /> Open in new tab
+            </a>
+          </Button>
+          <Button
             variant="ghost"
             size="sm"
             className="gap-1.5 hidden sm:inline-flex"
             onClick={tryNext}
             title="Try next server (Alt + →)"
           >
-            <SkipForward className="size-3.5" /> Next server
+            <SkipForward className="size-3.5" /> Next
           </Button>
           <Button
             variant="ghost"
@@ -184,6 +195,11 @@ export function StreamPlayer({
                 <Button onClick={tryNext} className="gap-2">
                   <SkipForward className="size-4" /> Try next server
                 </Button>
+                <Button asChild variant="secondary" className="gap-2">
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="size-4" /> Open in new tab
+                  </a>
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIframeKey((k) => k + 1)}
@@ -192,6 +208,9 @@ export function StreamPlayer({
                   <RefreshCw className="size-4" /> Reload
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground/70 leading-snug pt-1">
+                "Open in new tab" almost always works — providers can block iframes but not direct visits.
+              </p>
             </div>
           </div>
         )}
@@ -237,24 +256,45 @@ export function StreamPlayer({
                   {list.map((s) => {
                     const realIdx = STREAM_SOURCES.findIndex((x) => x.id === s.id);
                     const active = realIdx === activeIdx;
+                    const srcUrl =
+                      mediaType === "tv" && s.tv && season != null && episode != null
+                        ? s.tv(tmdbId, season, episode)
+                        : s.movie(tmdbId);
                     return (
-                      <button
-                        key={s.id}
-                        onClick={() => setActiveIdx(realIdx)}
-                        className={cn(
-                          "rounded-md px-3 py-2 text-xs font-semibold border transition-all min-w-[6.5rem]",
-                          active
-                            ? "bg-brand border-brand text-white shadow-lg shadow-brand/30"
-                            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
-                        )}
-                      >
-                        <div className="flex flex-col items-start leading-tight">
-                          <span>{s.name}</span>
-                          {s.tagline && (
-                            <span className="text-[10px] opacity-70 font-normal">{s.tagline}</span>
+                      <div key={s.id} className="relative group/srv">
+                        <button
+                          onClick={() => setActiveIdx(realIdx)}
+                          className={cn(
+                            "rounded-md pl-3 pr-7 py-2 text-xs font-semibold border transition-all min-w-[6.5rem] w-full text-left",
+                            active
+                              ? "bg-brand border-brand text-white shadow-lg shadow-brand/30"
+                              : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-foreground"
                           )}
-                        </div>
-                      </button>
+                        >
+                          <div className="flex flex-col items-start leading-tight">
+                            <span>{s.name}</span>
+                            {s.tagline && (
+                              <span className="text-[10px] opacity-70 font-normal">{s.tagline}</span>
+                            )}
+                          </div>
+                        </button>
+                        <a
+                          href={srcUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Open in new tab"
+                          aria-label={`Open ${s.name} in new tab`}
+                          onClick={(e) => e.stopPropagation()}
+                          className={cn(
+                            "absolute right-1.5 top-1/2 -translate-y-1/2 grid place-items-center h-6 w-6 rounded transition-opacity",
+                            active
+                              ? "text-white/90 hover:bg-white/20"
+                              : "text-muted-foreground/70 hover:text-foreground hover:bg-white/10 opacity-60 group-hover/srv:opacity-100"
+                          )}
+                        >
+                          <ExternalLink className="size-3" />
+                        </a>
+                      </div>
                     );
                   })}
                 </div>
@@ -264,8 +304,8 @@ export function StreamPlayer({
 
           <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground/70 leading-snug pt-1">
             <AlertTriangle className="size-3 shrink-0 mt-0.5" />
-            Streams come from public providers. Quality and availability vary by title. If a server
-            shows pop-up ads, close them and the movie will play underneath.
+            Tap the ↗ next to any server to open it directly in a new tab — works even when the
+            embedded player is blocked. Pop-up ads can be closed; the movie plays underneath.
           </p>
         </div>
       </div>
