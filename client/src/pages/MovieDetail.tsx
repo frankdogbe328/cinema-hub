@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Play, Plus, Check, Star, Calendar, Clock, Share2, X, Film } from "lucide-react";
+import { Play, Plus, Check, Star, Calendar, Clock, Share2 } from "lucide-react";
 import { tmdb } from "@/lib/tmdb";
 import { api, errorMessage } from "@/lib/api";
 import { tmdbImage, formatRuntime, formatYear } from "@/lib/utils";
@@ -19,7 +19,6 @@ export default function MovieDetail() {
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
-  const [showTrailer, setShowTrailer] = useState(false);
   const [showStream, setShowStream] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(8);
@@ -66,10 +65,6 @@ export default function MovieDetail() {
   }
 
   const m = movieQ.data;
-  const trailer =
-    m.videos?.results?.find((v) => v.site === "YouTube" && v.type === "Trailer" && v.official) ||
-    m.videos?.results?.find((v) => v.site === "YouTube" && v.type === "Trailer") ||
-    m.videos?.results?.find((v) => v.site === "YouTube");
   const cast = m.credits?.cast?.slice(0, 12) ?? [];
   const similar = m.similar?.results ?? [];
   const backdrop = tmdbImage(m.backdrop_path, "original") || tmdbImage(m.poster_path, "w780");
@@ -191,23 +186,13 @@ export default function MovieDetail() {
             <p className="text-[15px] sm:text-base text-muted-foreground max-w-3xl leading-relaxed">{m.overview}</p>
 
             <div className="hidden sm:flex flex-wrap gap-3">
-              <Button size="lg" className="gap-2" onClick={() => setShowStream(true)}>
+              <Button size="lg" className="gap-2 h-12" onClick={() => setShowStream(true)}>
                 <Play className="size-4 fill-current" /> Watch now
               </Button>
-              {trailer && (
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="gap-2"
-                  onClick={() => setShowTrailer(true)}
-                >
-                  <Film className="size-4" /> Trailer
-                </Button>
-              )}
               <Button
                 size="lg"
                 variant="secondary"
-                className="gap-2"
+                className="gap-2 h-12"
                 onClick={handleWatchlist}
                 disabled={addWl.isPending || removeWl.isPending}
               >
@@ -221,7 +206,7 @@ export default function MovieDetail() {
                   </>
                 )}
               </Button>
-              <Button size="lg" variant="outline" className="gap-2" onClick={handleShare}>
+              <Button size="lg" variant="outline" className="gap-2 h-12" onClick={handleShare}>
                 <Share2 className="size-4" /> Share
               </Button>
             </div>
@@ -342,30 +327,6 @@ export default function MovieDetail() {
           <Share2 className="size-4" />
         </Button>
       </div>
-
-      {showTrailer && trailer && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/90 backdrop-blur-sm p-4 animate-fade-in"
-          onClick={() => setShowTrailer(false)}
-        >
-          <div className="relative w-full max-w-5xl aspect-video" onClick={(e) => e.stopPropagation()}>
-            <iframe
-              src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
-              title={trailer.name}
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-              className="size-full rounded-lg"
-            />
-            <button
-              onClick={() => setShowTrailer(false)}
-              className="absolute -top-12 right-0 grid place-items-center h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Close trailer"
-            >
-              <X className="size-5" />
-            </button>
-          </div>
-        </div>
-      )}
 
       <StreamPlayer
         open={showStream}
