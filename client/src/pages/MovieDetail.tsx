@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Play, Plus, Check, Star, Calendar, Clock, Share2 } from "lucide-react";
+import { Play, Plus, Check, Star, Calendar, Clock, Share2, Download } from "lucide-react";
 import { tmdb } from "@/lib/tmdb";
 import { api, errorMessage } from "@/lib/api";
 import { tmdbImage, formatRuntime, formatYear } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MovieRow } from "@/components/movies/MovieRow";
 import { StreamPlayer } from "@/components/movies/StreamPlayer";
+import { DownloadDialog } from "@/components/movies/DownloadDialog";
 import { useAuth } from "@/context/AuthContext";
 import { useWatchlist, useWatchlistMutations } from "@/hooks/useWatchlist";
 import { useToast } from "@/components/ui/toast";
@@ -20,6 +21,7 @@ export default function MovieDetail() {
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
   const [showStream, setShowStream] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(8);
   const [postingReview, setPostingReview] = useState(false);
@@ -193,6 +195,14 @@ export default function MovieDetail() {
                 size="lg"
                 variant="secondary"
                 className="gap-2 h-12"
+                onClick={() => setShowDownload(true)}
+              >
+                <Download className="size-4" /> Download
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="gap-2 h-12"
                 onClick={handleWatchlist}
                 disabled={addWl.isPending || removeWl.isPending}
               >
@@ -317,11 +327,19 @@ export default function MovieDetail() {
           size="lg"
           variant="secondary"
           className="flex-1 gap-2 h-12"
+          onClick={() => setShowDownload(true)}
+        >
+          <Download className="size-4" /> Download
+        </Button>
+        <Button
+          size="lg"
+          variant="outline"
+          className="px-3 h-12 w-12"
           onClick={handleWatchlist}
+          aria-label="Save"
           disabled={addWl.isPending || removeWl.isPending}
         >
           {inWatchlist ? <Check className="size-4" /> : <Plus className="size-4" />}
-          {inWatchlist ? "Saved" : "Save"}
         </Button>
         <Button size="lg" variant="outline" className="px-3 h-12 w-12" onClick={handleShare} aria-label="Share">
           <Share2 className="size-4" />
@@ -334,6 +352,13 @@ export default function MovieDetail() {
         tmdbId={m.id}
         mediaType="movie"
         title={title}
+      />
+
+      <DownloadDialog
+        open={showDownload}
+        onClose={() => setShowDownload(false)}
+        title={title}
+        year={formatYear(m.release_date || m.first_air_date)}
       />
     </div>
   );
