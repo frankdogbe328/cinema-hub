@@ -10,8 +10,11 @@ export function Footer() {
             <LogoLockup size="sm" />
           </Link>
           <p className="mt-3 max-w-md text-[14px] sm:text-sm text-muted-foreground leading-relaxed">
-            Discover, stream and download movies. Catalog powered by TMDB.
-            This product uses the TMDB API but is not endorsed or certified by TMDB.
+            Discover, stream and download movies — anywhere, on any device.
+            Built and powered by{" "}
+            <span className="font-brand font-semibold text-foreground">
+              Softvara<span className="text-brand">.</span>
+            </span>
           </p>
         </div>
         <div className="flex gap-6 sm:gap-8 text-[13px] sm:text-sm text-muted-foreground">
